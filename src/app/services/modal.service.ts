@@ -1,41 +1,41 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable } from '@angular/core';
 
 interface IModal {
   id: string;
-  element: HTMLDialogElement;
+  visible: boolean;
 }
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class ModalService {
-  private modals = signal<IModal[]>([]);
+  private modals: IModal[] = []
 
-  constructor() {}
+  constructor() { }
 
-  register(id: string, element: HTMLDialogElement) {
-    this.modals.set([
-      ...this.modals(),
-      {
-        id,
-        element,
-      },
-    ]);
+  register(id: string) {
+    this.modals.push({
+      id,
+      visible: false
+    })
   }
 
   unregister(id: string) {
-    this.modals.set(this.modals().filter((element) => element.id !== id));
+    this.modals = this.modals.filter(
+      element => element.id !== id
+    )
   }
 
-  toggle(id: string) {
-    const modal = this.modals().find((item) => item.id === id);
+  isModalOpen(id: string) : boolean {
+    return !!this.modals.find(element => element.id === id)?.visible
+  }
 
-    if (!modal) return;
+  toggleModal(id: string) {
+    const modal = this.modals.find(element => element.id === id)
 
-    if (modal.element.open) {
-      modal.element.close();
-    } else {
-      modal.element.showModal();
+    if(modal) {
+      modal.visible = !modal.visible
     }
+    // this.visible = !this.visible
   }
 }

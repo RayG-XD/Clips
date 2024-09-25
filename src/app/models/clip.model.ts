@@ -1,13 +1,13 @@
-import { Timestamp } from '@angular/fire/firestore';
+import firebase from 'firebase/compat/app'
 
-export interface IClip {
+export default interface IClip {
   docID?: string;
   uid: string;
   displayName: string;
   title: string;
   fileName: string;
-  clipURL: string;
+  url: string;
+  timestamp: firebase.firestore.FieldValue;
   screenshotURL: string;
-  screenshotFilename: string;
-  timestamp: Timestamp;
+  screenshotFileName: string;
 }

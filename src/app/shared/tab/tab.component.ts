@@ -1,13 +1,17 @@
-import { Component, input, signal } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 
 @Component({
   selector: 'app-tab',
-  standalone: true,
-  imports: [],
   templateUrl: './tab.component.html',
-  styleUrl: './tab.component.css',
+  styleUrls: ['./tab.component.css']
 })
-export class TabComponent {
-  tabTitle = input('');
-  active = signal(false);
+export class TabComponent implements OnInit {
+  @Input() tabTitle = ''
+  @Input() active =  false
+
+  constructor() { }
+
+  ngOnInit(): void {
+  }
+
 }

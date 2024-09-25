@@ -1,51 +1,48 @@
-import { Component, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { Auth, signInWithEmailAndPassword } from '@angular/fire/auth';
-import { AlertComponent } from '../../shared/alert/alert.component';
+import { Component, OnInit } from '@angular/core';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 
 @Component({
   selector: 'app-login',
-  standalone: true,
-  imports: [FormsModule, AlertComponent],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.css',
+  styleUrls: ['./login.component.css']
 })
-export class LoginComponent {
-  auth = inject(Auth);
-
+export class LoginComponent implements OnInit {
   credentials = {
     email: '',
-    password: '',
-  };
+    password: ''
+  }
+  showAlert = false
+  alertMsg = 'Please wait! We are logging you in.'
+  alertColor = 'blue'
+  inSubmission = false
 
-  showAlert = signal(false);
-  alertMsg = signal('Please wait! We are logging you in.');
-  alertColor = signal('blue');
-  inSubmission = signal(false);
+  constructor(private auth: AngularFireAuth) { }
+
+  ngOnInit(): void {
+  }
 
   async login() {
-    this.showAlert.set(true);
-    this.alertMsg.set('Please wait! We are logging you in.');
-    this.alertColor.set('blue');
-    this.inSubmission.set(true);
+    this.showAlert = true
+    this.alertMsg = 'Please wait! We are logging you in.'
+    this.alertColor = 'blue'
+    this.inSubmission = true
 
     try {
-      await signInWithEmailAndPassword(
-        this.auth,
-        this.credentials.email,
-        this.credentials.password
-      );
-    } catch (e) {
-      this.inSubmission.set(false);
-      this.alertMsg.set('An unexpected error occured! Please try again later.');
-      this.alertColor.set('red');
+      await this.auth.signInWithEmailAndPassword(
+        this.credentials.email, this.credentials.password
+      )
+    } catch(e) {
+      this.inSubmission = false
+      this.alertMsg = 'An unexpected error occurred. Please try again later.'
+      this.alertColor = 'red'
 
-      console.error(e);
+      console.log(e)
 
-      return;
+      return 
     }
 
-    this.alertMsg.set('Success! You are now logged in.');
-    this.alertColor.set('green');
+    this.alertMsg = 'Success! You are now logged in.'
+    this.alertColor = 'green'
   }
+
 }

@@ -1,32 +1,32 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Component } from '@angular/core';
+import { By } from '@angular/platform-browser';
 
 import { TabsContainerComponent } from './tabs-container.component';
-import { Component } from '@angular/core';
 import { TabComponent } from '../tab/tab.component';
-import { By } from '@angular/platform-browser';
 
 @Component({
   template: `
     <app-tabs-container>
-      <app-tab tabTitle="Tab One">Hey!</app-tab>
-      <app-tab tabTitle="Tab Two">Hi!</app-tab>
+      <app-tab tabTitle="Tab 1">Tab 1</app-tab>
+      <app-tab tabTitle="Tab 2">Tab 2</app-tab>
     </app-tabs-container>
   `,
-  standalone: true,
-  imports: [TabsContainerComponent, TabComponent],
 })
-class TestPostComponent {}
+class TestHostComponent {}
 
 describe('TabsContainerComponent', () => {
-  let component: TestPostComponent;
-  let fixture: ComponentFixture<TestPostComponent>;
+  let component: TestHostComponent;
+  let fixture: ComponentFixture<TestHostComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TestPostComponent, TabComponent, TabsContainerComponent],
+      declarations: [TabsContainerComponent, TabComponent, TestHostComponent],
     }).compileComponents();
+  });
 
-    fixture = TestBed.createComponent(TestPostComponent);
+  beforeEach(() => {
+    fixture = TestBed.createComponent(TestHostComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -36,11 +36,11 @@ describe('TabsContainerComponent', () => {
   });
 
   it('should have two tabs', () => {
-    const tabs = fixture.debugElement.queryAll(By.css('nav > a'));
+    const tabs = fixture.debugElement.queryAll(By.css('li'));
     const containerComponent = fixture.debugElement.query(
       By.directive(TabsContainerComponent)
     );
-    const tabsProp = containerComponent.componentInstance.tabs();
+    const tabsProp = containerComponent.componentInstance.tabs;
 
     expect(tabs.length).withContext('Tabs did not render').toBe(2);
     expect(tabsProp.length)

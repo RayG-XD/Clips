@@ -1,89 +1,87 @@
-import {
-  Component,
-  inject,
-  input,
-  effect,
-  signal,
-  output,
+import { 
+  Component, OnInit, OnDestroy, Input, OnChanges, Output,
+  EventEmitter
 } from '@angular/core';
-import { ModalComponent } from '../../shared/modal/modal.component';
-import { IClip } from '../../models/clip.model';
-import { ReactiveFormsModule, Validators, FormBuilder } from '@angular/forms';
-import { InputComponent } from '../../shared/input/input.component';
-import { AlertComponent } from '../../shared/alert/alert.component';
-import { NgClass } from '@angular/common';
-import { ClipService } from '../../services/clip.service';
+import { ModalService } from 'src/app/services/modal.service';
+import IClip from 'src/app/models/clip.model';
+import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { ClipService } from 'src/app/services/clip.service';
 
 @Component({
   selector: 'app-edit',
-  standalone: true,
-  imports: [
-    ModalComponent,
-    ReactiveFormsModule,
-    InputComponent,
-    AlertComponent,
-    NgClass,
-  ],
   templateUrl: './edit.component.html',
-  styleUrl: './edit.component.css',
+  styleUrls: ['./edit.component.css']
 })
-export class EditComponent {
-  activeClip = input<IClip | null>(null);
-  fb = inject(FormBuilder);
-  clipService = inject(ClipService);
+export class EditComponent implements OnInit, OnDestroy, OnChanges {
+  @Input() activeClip: IClip | null = null
+  inSubmission = false
+  showAlert = false
+  alertColor = 'blue'
+  alertMsg = 'Please wait! Updating clip.'
+  @Output() update = new EventEmitter()
 
-  form = this.fb.nonNullable.group({
-    id: [''],
-    title: ['', [Validators.required, Validators.minLength(3)]],
-  });
+  clipID = new UntypedFormControl('')
+  title = new UntypedFormControl('', [
+    Validators.required,
+    Validators.minLength(3)
+  ])
+  editForm = new UntypedFormGroup({
+    title: this.title,
+    id: this.clipID
+  })
 
-  inSubmission = signal(false);
-  showAlert = signal(false);
-  alertColor = signal('blue');
-  alertMsg = signal('Please wait! Updating clip');
+  constructor(
+    private modal: ModalService, 
+    private clipService: ClipService
+  ) { }
 
-  update = output<IClip>();
+  ngOnInit(): void {
+    this.modal.register('editClip')
+  }
 
-  constructor() {
-    effect(
-      () => {
-        this.form.controls.id.setValue(this.activeClip()?.docID ?? '');
-        this.form.controls.title.setValue(this.activeClip()?.title ?? '');
+  ngOnDestroy() {
+    this.modal.unregister('editClip')
+  }
 
-        this.inSubmission.set(false);
-        this.showAlert.set(false);
-      },
-      { allowSignalWrites: true }
-    );
+  ngOnChanges() {
+    if(!this.activeClip) {
+      return
+    }
+
+    this.inSubmission = false
+    this.showAlert = false
+    this.clipID.setValue(this.activeClip.docID)
+    this.title.setValue(this.activeClip.title)
   }
 
   async submit() {
-    this.inSubmission.set(true);
-    this.showAlert.set(true);
-    this.alertColor.set('blue');
-    this.alertMsg.set('Please wait! Updating clip');
+    if(!this.activeClip) {
+      return
+    }
+
+    this.inSubmission = true
+    this.showAlert = true
+    this.alertColor = 'blue'
+    this.alertMsg = 'Please wait! Updating clip.'
 
     try {
       await this.clipService.updateClip(
-        this.form.controls.id.value,
-        this.form.controls.title.value
-      );
-    } catch (e) {
-      this.inSubmission.set(false);
-      this.alertColor.set('red');
-      this.alertMsg.set('Something went wrong! Try again later.');
-      return;
+        this.clipID.value, this.title.value
+      ) 
+    }
+    catch(e) {
+      this.inSubmission = false
+      this.alertColor = 'red'
+      this.alertMsg = 'Something went wrong. Try again later'
+      return
     }
 
-    const updatedClip = this.activeClip();
+    this.activeClip.title = this.title.value
+    this.update.emit(this.activeClip)
 
-    if (updatedClip) {
-      updatedClip.title = this.form.controls.title.value;
-      this.update.emit(updatedClip);
-    }
-
-    this.inSubmission.set(false);
-    this.alertColor.set('green');
-    this.alertMsg.set('Success!');
+    this.inSubmission = false
+    this.alertColor = 'green'
+    this.alertMsg = 'Success!'
   }
+
 }

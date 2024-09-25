@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { TabComponent } from './tab.component';
 import { By } from '@angular/platform-browser';
+import { TabComponent } from './tab.component';
 
 describe('TabComponent', () => {
   let component: TabComponent;
@@ -9,9 +8,11 @@ describe('TabComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TabComponent],
+      declarations: [TabComponent],
     }).compileComponents();
+  });
 
+  beforeEach(() => {
     fixture = TestBed.createComponent(TabComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -22,21 +23,21 @@ describe('TabComponent', () => {
   });
 
   it('should have .hidden class', () => {
-    const el = fixture.debugElement.query(By.css('.hidden'));
-    const el2 = fixture.nativeElement.querySelector('.hidden');
-    const el3 = document.querySelector('.hidden');
+    const element = fixture.debugElement.query(By.css('.hidden'));
+    const element2 = fixture.nativeElement.querySelector('.hidden');
+    const element3 = document.querySelector('.hidden');
 
-    expect(el).toBeTruthy();
+    expect(element).toBeTruthy();
   });
 
   it('should not have .hidden class', () => {
-    component.active.set(true);
+    component.active = true;
     fixture.detectChanges();
 
-    const el = fixture.debugElement.query(By.css('.hidden'));
-    const el2 = fixture.nativeElement.querySelector('.hidden');
-    const el3 = document.querySelector('.hidden');
+    const element = fixture.debugElement.query(By.css('.hidden'));
+    const element2 = fixture.nativeElement.querySelector('.hidden');
+    const element3 = document.querySelector('.hidden');
 
-    expect(el).not.toBeTruthy();
+    expect(element).not.toBeTruthy();
   });
 });

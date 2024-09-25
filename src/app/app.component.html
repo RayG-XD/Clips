@@ -2,6 +2,4 @@
 
 <router-outlet></router-outlet>
 
-@if (!(auth.authStateWithDelay$ | async)) {
-<app-auth-modal></app-auth-modal>
-}
+<app-auth-modal *ngIf="!(auth.isAuthenticatedWithDelay$ | async)"></app-auth-modal>
