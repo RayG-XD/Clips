@@ -22,7 +22,7 @@
     "@angular/platform-browser": "^14.0.0",
     "@angular/platform-browser-dynamic": "^14.0.0",
     "@angular/router": "^14.0.0",
-    "@ffmpeg/core": "^0.10.0",
+    "@ffmpeg/core": "^0.12.6",
     "@ffmpeg/ffmpeg": "^0.10.1",
     "@types/uuid": "^8.3.4",
     "@types/video.js": "^7.3.51",
